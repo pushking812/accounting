@@ -77,15 +77,16 @@ def load_spec_list(spec_files):
 
     return spec_list
 
-# Отладочная печать справочника
+# Отладочная печать списка
 def print_list(lst):
     for item_number, file_name, volume, unit in lst:
         print(f"File name: {file_name}, Item number: {item_number}, Volume: {volume}, Unit: {unit}")
 
 invoice_list = []
 
-# Загрузка данных из накладной в справочник 
+# Загрузка данных из накладной в список 
 def load_invoice(file_name):
+    check_files([file_name])
     global invoice_list
     try:
         wb = openpyxl.load_workbook(file_name)
