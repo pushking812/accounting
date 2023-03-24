@@ -28,6 +28,14 @@ def fatal_error(err, msg):
         print(f"Error: {err}\n{msg}")
         sys.exit(1)
 
+def nonfatal_error(err, msg):
+        messagebox.showerror("Error", f"{err}\n{msg}")
+        print(f"Error: {err}\n{msg}")
+
+def info_msg(text1, text2):
+        messagebox.showinfo("Information", f"{text1}\n{text2}")
+        print(f"Information: {text1}\n{text2}")
+
 # Проверка существования файла и корректности его формата (Excel)
 def check_files(file_list):
     for file_name in file_list:
@@ -38,11 +46,11 @@ def check_files(file_list):
                 openpyxl.load_workbook(file_name)
             except (InvalidFileException, BadZipFile) as err:
                 fatal_error(err, f"{file_name} is not a valid Excel file")
-    print("All files have been checked!")
+    info_msg("All files have been checked!", "")
 
 # Загрузка данных из спецификаций в справочник
-def load_spec_dictionary(spec_files):
-    spec_dict = {}
+def load_spec_list(spec_files):
+    spec_list = []
     empty_value = False
     for file_name in spec_files:
         try:
@@ -56,9 +64,9 @@ def load_spec_dictionary(spec_files):
 
                     if item_number == None or volume == None or unit == None:
                         empty_value = True
-                        print(f"Error: Cell values of row {row} in file {file_name} are empty")
+                        info_msg("Cell values of row in file are empty!", f"File:{file_name}, row: {row}")
 
-                    spec_dict[item_number] = (file_name, volume, unit)
+                    spec_list.append((item_number, file_name, volume, unit))
                 except IndexError:
                     fatal_error(IndexError, f"Error: Row {row} in file {file_name} is missing data")
         except InvalidFileException:
@@ -67,18 +75,18 @@ def load_spec_dictionary(spec_files):
     if empty_value == True:
         fatal_error("", f"Error: Rows of file {file_name} have empty values")
 
-    return spec_dict
+    return spec_list
 
 # Отладочная печать справочника
-def print_dict(dict):
-    for item_number, (file_name, volume, unit) in dict.items():
+def print_list(lst):
+    for item_number, file_name, volume, unit in lst:
         print(f"File name: {file_name}, Item number: {item_number}, Volume: {volume}, Unit: {unit}")
 
-invoice_dict = {}
+invoice_list = []
 
 # Загрузка данных из накладной в справочник 
 def load_invoice(file_name):
-    global invoice_dict
+    global invoice_list
     try:
         wb = openpyxl.load_workbook(file_name)
         sheet = wb.active
@@ -87,29 +95,16 @@ def load_invoice(file_name):
                 item_number = row[1]
                 volume = row[3]
                 unit = row[4]
-                invoice_dict[item_number] = (file_name, volume, unit)
+                invoice_list.append((item_number, file_name, volume, unit))
             except IndexError:
-                messagebox.showerror("Error", f"Error: {IndexError}\nRow {row} is missing data")
-                print(f"Error: {IndexError}:\nRow {row} is missing data")
+                nonfatal_error(IndexError, f"Error: {IndexError}\nRow {row} is missing data")
                 return
     except InvalidFileException:
-        messagebox.showerror("Error", f"Error: {InvalidFileException}\nCould not open file {file_name}")
-        print(f"Error: {InvalidFileException}\nCould not open file {file_name}")
+        nonfatal_error(InvalidFileException, f"Error: {InvalidFileException}\nCould not open file {file_name}")
         return
     messagebox.showinfo("Information", f"Invoice {file_name} loaded")
     print(f"Invoice {file_name} loaded")
-    print_dict(invoice_dict)
-
-
-def merge_dicts_by_key(dict1, dict2):
-    merged_dict = {}
-    not_found_dict = {}
-    for key, value in dict2.items():
-        if key in dict1:
-            merged_dict[key] = {**dict1[key], **value}
-        else:
-            not_found_dict[key] = value
-    return merged_dict, not_found_dict
+    print_list(invoice_list)
 
 # Активирование требуемого фрейма
 def raise_page(page):
@@ -118,8 +113,8 @@ def raise_page(page):
 # Загрузка и проверка данных
 spec_files = load_spec_files()
 check_files(spec_files)
-spec_dict = load_spec_dictionary(spec_files)
-print_dict(spec_dict)
+spec_list = load_spec_list(spec_files)
+print_list(spec_list)
 
 
 # GUI интерфейс многостраничного диалога
