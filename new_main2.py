@@ -22,11 +22,11 @@ def get_row(instance, headers):
 def get_instance_data(row, headers):
     instance_data = {}
     for header, cell in zip(headers, row):
-        if header.endswith("_instance"):
-            subinstances_class_name = header[:-len("_instance")]
-            subinstances_ids = cell.value.split(",") if cell.value else []
-            instance_data[subinstances_class_name] = subinstances_ids
-        else:
+        # if header.endswith("_instance"):
+        #     subinstances_class_name = header[:-len("_instance")]
+        #     subinstances_ids = cell.value.split(",") if cell.value else []
+        #     instance_data[subinstances_class_name] = subinstances_ids
+        # else:
             instance_data[header] = cell.value
     return instance_data
 
@@ -42,16 +42,29 @@ def load_temp_data(wb):
     # print(temp_data)  # Print out the temp_data dictionary for debugging
     return temp_data
 
+# def create_instances(temp_data):
+#     instances_by_id = {}
+#     for class_name, instances_data in temp_data.items():
+#         instance_class = globals()[class_name]
+#         for instance_data in instances_data:
+#             instance_id = instance_data["id_by_class"]
+#             instance = instance_class()
+#             instance.fields.update(instance_data)
+#             instances_by_id[(class_name, instance_id)] = instance
+#     return instances_by_id
+
 def create_instances(temp_data):
     instances_by_id = {}
     for class_name, instances_data in temp_data.items():
         instance_class = globals()[class_name]
         for instance_data in instances_data:
             instance_id = instance_data["id_by_class"]
-            instance = instance_class()
-            instance.fields.update(instance_data)
-            instances_by_id[(class_name, instance_id)] = instance
+            if (class_name, instance_id) not in instances_by_id:
+                instance = instance_class(instance_id)
+                instance.fields.update(instance_data)
+                instances_by_id[(class_name, instance_id)] = instance
     return instances_by_id
+
 
 def create_relationships(temp_data, instances_by_id):
     for class_name, instances_data in temp_data.items():
@@ -63,7 +76,7 @@ def create_relationships(temp_data, instances_by_id):
                     subinstances_class_name = subinstances_class_name[:-len("_instance")]
                     for subinstance_id in subinstances_ids:
                         subinstance = instances_by_id[(subinstances_class_name, int(subinstance_id))]
-                        print(subinstances_class_name, subinstances_ids, subinstance)  # Print out variables for debugging
+                        # print(subinstances_class_name, subinstances_ids, subinstance)
                         instance.add_subinstance(subinstance)
 
 class CountInstances:
@@ -91,7 +104,7 @@ class CountInstances:
 class Instance:
     instances_by_class = {}
 
-    def __init__(self, instance_class):
+    def __init__(self, instance_class, instance_id = None):
         class_name = instance_class.__name__
 
         instances = Instance.instances_by_class
@@ -102,17 +115,31 @@ class Instance:
 
         instances[class_name].append(self)
 
+        if not instance_id:
+            instance_id=CountInstances.add_instance(self)
+
         self.fields = {
-            'id_by_class': CountInstances.add_instance(self)
+            'id_by_class': instance_id
         }
 
         self.subinstances = {}
     
+    # def add_subinstance(self, instance):
+    #     key = type(instance).__name__
+    #     if key not in self.subinstances:
+    #         self.subinstances[key] = []
+    #     self.subinstances[key].append(instance)
+
     def add_subinstance(self, instance):
         key = type(instance).__name__
         if key not in self.subinstances:
             self.subinstances[key] = []
-        self.subinstances[key].append(instance)
+        if instance not in self.subinstances[key]:
+            self.subinstances[key].append(instance)
+            print()
+
+            
+
 
     def get_subinstance(self, key, index=None):
         if key in self.subinstances:
@@ -200,39 +227,46 @@ class Project(Instance):
         self.fields['project_number'] = project_number
         self.fields['project_name'] = project_name
 
-# заполняем справочники
-# o = Object('O1', 'Object1')
-# p1 = Project('P1', 'Project1')
-# p2 = Project('P2', 'Project2')
-# p3 = Project('P3', 'Project3')
+def to_new_file():
+    # заполняем справочники
+    o = Object('O1', 'Object1')
+    p1 = Project('P1', 'Project1')
+    p2 = Project('P2', 'Project2')
+    p3 = Project('P3', 'Project3')
+    # заполяем записи данными
+    obr1 = ObjectRecord(o)
+    obr2 = ObjectRecord(o)
+    obr3 = ObjectRecord(o)
+    prr1 = ProjectRecord(p1)
+    prr2 = ProjectRecord(p2)
+    prr3 = ProjectRecord(p3)
+    # организуем связи между данными
+    obr1.add_subinstance(prr1)
+    obr2.add_subinstance(prr2)
+    obr3.add_subinstance(prr3)
+    Object.to_excel('data.xlsx')
+    Project.to_excel('data.xlsx')
+    ObjectRecord.to_excel('data.xlsx')
+    ProjectRecord.to_excel('data.xlsx')
 
-# заполяем записи данными
-# obr1 = ObjectRecord(o)
-# obr2 = ObjectRecord(o)
-# obr3 = ObjectRecord(o)
+def read_from_file():
+    Object.from_excel('data.xlsx')
+    Project.from_excel('data.xlsx')
+    ObjectRecord.from_excel('data.xlsx')
+    ProjectRecord.from_excel('data.xlsx')
+    # objrec = Instance.instances_by_class['ObjectRecord']
+    # for obj in objrec:
+    #     print(obj.fields)
+    #     print(obj.subinstances)
 
-# prr1 = ProjectRecord(p1)
-# prr2 = ProjectRecord(p2)
-# prr3 = ProjectRecord(p3)
+def write_to_file():
+    Object.to_excel('data2.xlsx')
+    Project.to_excel('data2.xlsx')
+    ObjectRecord.to_excel('data2.xlsx')
+    ProjectRecord.to_excel('data2.xlsx')
 
-# организуем связи между данными
-# obr1.add_subinstance(prr1)
-# obr2.add_subinstance(prr2)
-# obr3.add_subinstance(prr3)
+# to_new_file()
 
+read_from_file()
+write_to_file()
 
-
-# Object.to_excel('data.xlsx')
-# Project.to_excel('data.xlsx')
-# ObjectRecord.to_excel('data.xlsx')
-# ProjectRecord.to_excel('data.xlsx')
-
-Object.from_excel('data.xlsx')
-Project.from_excel('data.xlsx')
-ObjectRecord.from_excel('data.xlsx')
-ProjectRecord.from_excel('data.xlsx')
-
-# objrec = Instance.instances_by_class['ObjectRecord']
-# for obj in objrec:
-#     print(obj.fields)
-    # print(obj.subinstances)
