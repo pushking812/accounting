@@ -90,6 +90,7 @@ def create_relationships(temp_data, instances_by_id):
                 instance = instances_by_id[(class_name, instance_id)]
                 # проходим по всем элементам списка свойств экземпляра
                 for property_name, property_value in properties_data.items():
+
                     # если есть постфикс, то элемент является экземпляром класса
                     # значит его нужно добавить в свойство subinstances
                     if property_name.endswith("_instance"):
@@ -98,9 +99,10 @@ def create_relationships(temp_data, instances_by_id):
                         
                         # если указано несколько номеров экземпляров через запятую,
                         # запятые пока не используются, на будущее
-                        subinstance_ids = property_value.split(',')  
+                        subinstance_ids = str(property_value).split(',')  
                         # создаем экземпляры для всех порядковых номеров
                         for subinstance_id in subinstance_ids:
-                            subinstance = instances_by_id[(property_name, int(subinstance_id))]
-                            instance.add_subinstance(subinstance)
+                            if subinstance_id != 'None':
+                                subinstance = instances_by_id[(property_name, int(subinstance_id))]
+                                instance.add_subinstance(subinstance)
     pass

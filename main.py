@@ -13,17 +13,17 @@ def initialize_instances():
     # справочник объектов
     objects = [Object(**d) for d in 
         [
-            {'instance_id': None, 'object_number': 'O{i}', 'object_name': 'Object1 O{i}'}
+            {'instance_id': None, 'object_number': f'O{i}', 'object_name': f'Object1 O{i}'}
             for i in range(1)
-        ]
+        ] 
     ]
 
     # справочник проектов
     projects = [Project(**d) for d in 
         [
-            {'instance_id': None, 'project_number': f'P{i}', 'project_name': f'Project P{i}'},
+            {'instance_id': None, 'project_number': f'P{i}', 'project_name': f'Project P{i}'}
             for i in range(3)
-        ]
+        ] 
     ]
     
     # справочник спецификаций
@@ -31,49 +31,42 @@ def initialize_instances():
         [ 
             {'instance_id': None, 'spec_number': f'S{i}', 'spec_name': f'Spec P{i}'}
             for i in range(6)
-        ]
+        ] 
     ]
 
     # справочник категорий материалов и оборудования
     cat = [Cat(**d) for d in
         [
            {'instance_id': None, 'cat_number': f'C{i}' , 'cat_name': f'Cat C{i}'}
-           for i in range(12)
-        ]
+           for i in range(24)
+        ] 
     ]
     
-    # дерево категорий материалов и оборудования
-    cats_records = [CatRecord(**d) for d in 
-        [
-            {'instance_id': None, 'subinstances': [cat[i], cat[i+1]]}
-            for i in range(start=1, stop=13, step=2)
-        ]
-    ]
-
     # справочник материалов и оборудования
     equipments = [Equip(**d) for d in
         [
            {'instance_id': None, 'equip_number': f'E{i}', 'equip_name':  f'Equip E{i}'}
-           for i in range(12)
-        ]
+           for i in range(24)
+        ] 
     ]
     
+    cr=[]
+    for i in range(1, 14, 4):
+            cr.append({'instance_id': i, 'subinstances':  [cat[i]]})    # 0
+            cr.append({'instance_id': i+1, 'subinstances': [cat[i+1], cat[i+2]]}) # 0.0
+            cr.append({'instance_id': i+2, 'subinstances': None})                 # 0.0.0
+            cr.append({'instance_id': i+3, 'subinstances': None})                 # 0.0.1
+        
+    # дерево категорий материалов и оборудования
+    cats_records = [CatRecord(**d) for d in cr]
+
+
     # список записей с информацией о материалах и оборудовании
     # (категория материала, документы качества на материал и т.п.)
     equips_records = [EquipRecord(**d) for d in 
         [
-            {'instance_id': None, 'subinstances': [equipments[0],  cats_records[2]]},
-            {'instance_id': None, 'subinstances': [equipments[1],  cats_records[3]]},
-            {'instance_id': None, 'subinstances': [equipments[2],  cats_records[5]]},
-            {'instance_id': None, 'subinstances': [equipments[3],  cats_records[6]]},
-            {'instance_id': None, 'subinstances': [equipments[4],  cats_records[9]]},
-            {'instance_id': None, 'subinstances': [equipments[5],  cats_records[10]]},
-            {'instance_id': None, 'subinstances': [equipments[6],  cats_records[12]]},
-            {'instance_id': None, 'subinstances': [equipments[7],  cats_records[13]]},
-            {'instance_id': None, 'subinstances': [equipments[8],  cats_records[2]]},
-            {'instance_id': None, 'subinstances': [equipments[9],  cats_records[5]]},
-            {'instance_id': None, 'subinstances': [equipments[10], cats_records[9]]},
-            {'instance_id': None, 'subinstances': [equipments[11], cats_records[12]]},
+            {'instance_id': None, 'subinstances': [equipments[i],  cats_records[i]]}
+            for i in range(16)
         ]
     ]
 
@@ -98,7 +91,6 @@ def initialize_instances():
             {'instance_id': None, 'subinstances': [projects[2]]+[equips_records[i] for i in range(4,6)]}
         ]
     ]
-
     
     # список объектов, корневая сущность 
     objects_records = [ObjectRecord(**d) for d in 
@@ -124,11 +116,11 @@ def write_to_file(file):
 
 class AccApp:
     def __init__(self):
-        initialize_instances()
+        # initialize_instances()
         pass
 
     def run(self):
-        # read_from_file('data/data.xlsx')
+        read_from_file('data/data.xlsx')
         write_to_file('data/data2.xlsx')
 
 def main():
