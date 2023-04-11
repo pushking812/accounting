@@ -1,107 +1,147 @@
 import os
-from accounting.model.project import Project
-from accounting.model.object import Object
-from accounting.model.record import ObjectRecord, ProjectRecord, SpecRecord, EquipRecord, CatRecord
 from accounting.model.instance import Instance
-from accounting.model.specification import Spec
-from accounting.model.equipment import Equip
-from accounting.model.category import Cat
+from accounting.model.subject import *
+from accounting.model.doc import *
+from accounting.model.docrecord import *
+from accounting.model.nomenclature import *
 
 def initialize_instances():
     '''инициализация тестовыми данными'''
     
     # справочник объектов
-    objects = [Object(**d) for d in 
+    objs = [Object(**d) for d in 
         [
-            {'instance_id': None, 'object_number': f'O{i}', 'object_name': f'Object1 O{i}'}
+            {'instance_id': None, 'number': f'O{i}', 'name': f'Object1 O{i}'}
             for i in range(1)
         ] 
     ]
 
     # справочник проектов
-    projects = [Project(**d) for d in 
+    projs = [Project(**d) for d in 
         [
-            {'instance_id': None, 'project_number': f'P{i}', 'project_name': f'Project P{i}'}
+            {'instance_id': None, 'number': f'P{i}', 'name': f'Project P{i}'}
             for i in range(3)
         ] 
     ]
     
     # справочник спецификаций
-    specs = [Spec(**d) for d in
+    specs = [SpecLst(**d) for d in
         [ 
-            {'instance_id': None, 'spec_number': f'S{i}', 'spec_name': f'Spec P{i}'}
+            {'instance_id': None, 'number': f'S{i}', 'name': f'SpecLst P{i}'}
             for i in range(6)
         ] 
     ]
+    
+    # справочник кабельных журналов
+    cabjs = [CableLst(**d) for d in
+        [ 
+            {'instance_id': None, 'number': f'S{i}', 'name': f'CableLst P{i}'}
+            for i in range(3)
+        ] 
+    ]
+    
+    # справочник кабельных журналов
+    wrkls = [WorkLst(**d) for d in
+        [ 
+            {'instance_id': None, 'number': f'S{i}', 'name': f'WorkLst P{i}'}
+            for i in range(3)
+        ] 
+    ]
 
+    # справочник ведомостей работ
+    wrks = [Work(**d) for d in
+        [ 
+            {'instance_id': None, 'number': f'S{i}', 'name': f'Work P{i}'}
+            for i in range(6)
+        ] 
+    ]
+    
     # справочник категорий материалов и оборудования
-    cat = [Cat(**d) for d in
+    cats = [Cat(**d) for d in
         [
-           {'instance_id': None, 'cat_number': f'C{i}' , 'cat_name': f'Cat C{i}'}
+           {'instance_id': None, 'number': f'C{i}' , 'name': f'Cat C{i}'}
            for i in range(24)
         ] 
     ]
     
     # справочник материалов и оборудования
-    equipments = [Equip(**d) for d in
+    equips = [Equipment(**d) for d in
         [
-           {'instance_id': None, 'equip_number': f'E{i}', 'equip_name':  f'Equip E{i}'}
+           {'instance_id': None, 'number': f'E{i}', 'name':  f'Nomenclature E{i}'}
            for i in range(24)
         ] 
+
     ]
     
+    # дерево категорий материалов и оборудования
     cr=[]
     for i in range(1, 14, 4):
-            cr.append({'instance_id': i, 'subinstances':  [cat[i]]})    # 0
-            cr.append({'instance_id': i+1, 'subinstances': [cat[i+1], cat[i+2]]}) # 0.0
-            cr.append({'instance_id': i+2, 'subinstances': None})                 # 0.0.0
-            cr.append({'instance_id': i+3, 'subinstances': None})                 # 0.0.1
-        
-    # дерево категорий материалов и оборудования
-    cats_records = [CatRecord(**d) for d in cr]
+            cr.append({'instance_id': i, 'name':f'CatRecord{i}',   'subinstances': [cats[i]]})              # 0
+            cr.append({'instance_id': i+1, 'name':f'CatRecord{i}', 'subinstances': [cats[i+1], cats[i+2]]}) # 0.0
+            cr.append({'instance_id': i+2, 'name':f'CatRecord{i}', 'subinstances': None})                 # 0.0.0
+            cr.append({'instance_id': i+3, 'name':f'CatRecord{i}', 'subinstances': None})                 # 0.0.1
+    cat_recs = [CatRecord(**d) for d in cr]
 
 
     # список записей с информацией о материалах и оборудовании
     # (категория материала, документы качества на материал и т.п.)
-    equips_records = [EquipRecord(**d) for d in 
+    nom_recs = [EquipRecord(**d) for d in 
         [
-            {'instance_id': None, 'subinstances': [equipments[i],  cats_records[i]]}
+            {'instance_id': None, 'name':f'EquipRecord{i}',
+             'subinstances': [equips[i],  cat_recs[i]]}
             for i in range(16)
         ]
     ]
 
-    # список записей с информацией об оборудовании для каждой спецификации
-    # записи для документа Спецификация 
-    specs_records = [SpecRecord(**d) for d in 
+    # список кабельных журналов со связанной номенклатурой
+    cabj_recs = [CableJnlRecord(**d) for d in 
         [
-            {'instance_id': None, 'subinstances': [specs[0]]+[equips_records[i] for i in range(0,2)]},
-            {'instance_id': None, 'subinstances': [specs[1]]+[equips_records[i] for i in range(2,4)]},
-            {'instance_id': None, 'subinstances': [specs[2]]+[equips_records[i] for i in range(4,6)]},
-            {'instance_id': None, 'subinstances': [specs[3]]+[equips_records[i] for i in range(6,8)]},
-            {'instance_id': None, 'subinstances': [specs[4]]+[equips_records[i] for i in range(8,10)]},
-            {'instance_id': None, 'subinstances': [specs[5]]+[equips_records[i] for i in range(10,12)]}
+            {'instance_id': None, 'name':f'CableJnlRecord{j}',
+             'subinstances': [cabjs[i//9]]+[nom_recs[i//2] for i in range(j,j+3)]}
+            for j in range(0, 25, 9)
+        ]
+    ]
+    
+    # список ведомостей работ
+    wrkl_recs = [WorkLstRecord(**d) for d in 
+        [
+            {'instance_id': None, 'name':f'WorkLstRecord{j}',
+             'subinstances': [wrkls[i//9]]+[wrks[i//5] for i in range(j,j+3)]}
+            for j in range(0, 25, 9)
+        ]
+    ]
+    
+    # список спецификаций со связанной номенклатурой
+    spec_recs = [SpecRecord(**d) for d in 
+        [
+            {'instance_id': None, 'name':f'SpecRecord{j}', 
+             'subinstances': [specs[j//2]]+[nom_recs[i] for i in range(j,j+2)]}
+            for j in range(0, 12, 2)
         ]
     ]
 
     # список проектов со связанными спецификациями
-    projects_records = [ProjectRecord(**d) for d in 
+    proj_recs = [ProjectRecord(**d) for d in 
         [
-            {'instance_id': None, 'subinstances': [projects[0]]+[equips_records[i] for i in range(0,2)]},
-            {'instance_id': None, 'subinstances': [projects[1]]+[equips_records[i] for i in range(2,4)]},
-            {'instance_id': None, 'subinstances': [projects[2]]+[equips_records[i] for i in range(4,6)]}
+            {'instance_id': None, 'name':f'ProjectRecord{i}',
+             'subinstances': [projs[i]]+[wrkl_recs[i]]+[cabj_recs[i]]+[spec_recs[i]]
+            }
+            for i in range(3)
         ]
     ]
     
-    # список объектов, корневая сущность 
-    objects_records = [ObjectRecord(**d) for d in 
+    # список объектов со связанными проектами
+    obj_recs = [ObjectRecord(**d) for d in 
         [
-            {'instance_id': None, 'subinstances': [objects[0], s]}
-            for s in projects_records
+            {'instance_id': None, 'name':f'ObjectRecord{j}',
+             'subinstances': [objs[j]]+[proj_recs[i] for i in range(j,j+3)]}
+            for j in range(1)
         ]
     ]
     
+    return obj_recs
     
-### получаем словарь хранящий существующие типы классов по их названиям 
+# получаем словарь хранящий существующие типы классов по их названиям 
 classes_by_name = {name: obj for name, obj in globals().items() if isinstance(obj, type)}
 pass
 
@@ -113,14 +153,17 @@ def write_to_file(file):
     '''записывает данные экземпляров классов в существующий файл'''
     Instance.to_excel(file)
 
+o=[]
 
 class AccApp:
     def __init__(self):
-        # initialize_instances()
+        global o
+        o=initialize_instances()
         pass
 
     def run(self):
-        read_from_file('data/data.xlsx')
+        o[0].traverse_graph()
+        # read_from_file('data/data.xlsx')
         write_to_file('data/data2.xlsx')
 
 def main():

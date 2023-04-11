@@ -1,8 +1,7 @@
-
-from . import countinstances
+from . import instance
 from ..tools import fromexcel
 from ..tools import toexcel
-
+from graphviz import Digraph
 
 class Instance:
     instances_by_class = {}
@@ -19,7 +18,7 @@ class Instance:
         instances[class_name].append(self)
 
         if instance_id == None:
-            instance_id = countinstances.CountInstances.add_instance(self)
+            instance_id = instance.CountInstances.add_instance(self)
 
         self.fields = {
             'id_by_class': instance_id
@@ -73,6 +72,24 @@ class Instance:
                     if hasattr(property_value, '__dict__'):
                         property_value.traverse_properties(
                             depth=depth-1 if depth is not None else None)
+    
+    
+    def traverse_graph(self, depth=None, graph=None):
+        if graph is None:
+            graph = Digraph()
+            graph.node(self.fields['name'], label=f"{self.__class__.__name__}: {self.fields['name']}")
+        if depth is None or depth > 0:
+            for property_name, property_value in self.__dict__.items():
+                if property_name == 'subinstances':
+                    for class_name, subinstances in property_value.items():
+                        for subinstance in subinstances:
+                            graph.edge(self.fields['name'], subinstance.fields['name'])
+                            subinstance.traverse_graph(
+                                depth=depth-1 if depth is not None else None, graph=graph)
+                elif hasattr(property_value, '__dict__'):
+                    property_value.traverse_graph(
+                        depth=depth-1 if depth is not None else None, graph=graph)
+        return graph
 
 
     @classmethod
@@ -126,3 +143,25 @@ class Instance:
                     result.append((property_name, property_value))
         return result
     
+
+class CountInstances:
+    count_by_class = {}
+    max_id_by_class = {}
+
+    @classmethod
+    def add_instance(cls, instance):
+        class_name = instance.__class__.__name__
+        cls.count_by_class[class_name] = cls.count_by_class.get(class_name, 0) + 1
+        cls.max_id_by_class[class_name] = cls.max_id_by_class.get(class_name, 0) + 1
+        return cls.max_id_by_class[class_name]
+    
+    @classmethod
+    def remove_instance(cls, instance):
+        class_name = instance.__class__.__name__
+        if class_name in cls.count_by_class:
+            cls.count_by_class[class_name] -= 1
+        
+    @classmethod
+    def get_number(cls, instance):
+        class_name = instance.__class__.__name__
+        return cls.count_by_class.get(class_name, 0)
