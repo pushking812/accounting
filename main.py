@@ -85,9 +85,9 @@ def initialize_instances():
 
     # список записей с информацией о материалах и оборудовании
     # (категория материала, документы качества на материал и т.п.)
-    nom_recs = [EquipRecord(**d) for d in 
+    nom_recs = [NomRecord(**d) for d in 
         [
-            {'instance_id': None, 'name':f'EquipRecord{i}',
+            {'instance_id': None, 'name':f'NomRecord{i}',
              'subinstances': [equips[i],  cat_recs[i]]}
             for i in range(16)
         ]
@@ -162,7 +162,8 @@ class AccApp:
         pass
 
     def run(self):
-        o[0].traverse_graph()
+        my_graph = o[0].traverse_graph()
+        my_graph.view()
         # read_from_file('data/data.xlsx')
         write_to_file('data/data2.xlsx')
 

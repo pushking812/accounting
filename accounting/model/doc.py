@@ -15,12 +15,12 @@ class Doc(Instance):
 
 class CableLst(Doc):
     def __init__(self, instance_id = None, number = None, name = None):
-        super().__init__(type(self), instance_id)
+        super().__init__(type(self), instance_id, name)
 
-class SpecLst(Instance):
+class SpecLst(Doc):
     def __init__(self, instance_id = None, number = None, name = None):
-        super().__init__(type(self), instance_id)
+        super().__init__(type(self), instance_id, name)
 
-class WorkLst(Instance):
+class WorkLst(Doc):
     def __init__(self, instance_id = None, number = None, name = None):
-        super().__init__(type(self), instance_id)
+        super().__init__(type(self), instance_id, name)

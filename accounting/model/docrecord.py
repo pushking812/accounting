@@ -30,7 +30,7 @@ class CableJnlRecord(DocRecord):
     def __init__(self, instance_id = None, subinstances = None, name = None):
         super().__init__(type(self), instance_id, subinstances, name)
 
-class EquipRecord(DocRecord):
+class NomRecord(DocRecord):
     def __init__(self, instance_id = None, subinstances = None, name = None):
         super().__init__(type(self), instance_id, subinstances, name)
 

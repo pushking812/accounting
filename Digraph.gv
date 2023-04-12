@@ -1,0 +1,83 @@
+digraph {
+	ObjectRecord0 [label="ObjectRecord: ObjectRecord0"]
+	ObjectRecord0 -> "Object1 O0"
+	ObjectRecord0 -> ProjectRecord0
+	ProjectRecord0 -> "Project P0"
+	ProjectRecord0 -> WorkLstRecord0
+	WorkLstRecord0 -> ""
+	WorkLstRecord0 -> "Work P0"
+	ProjectRecord0 -> CableJnlRecord0
+	CableJnlRecord0 -> ""
+	CableJnlRecord0 -> EquipRecord0
+	EquipRecord0 -> ""
+	EquipRecord0 -> CatRecord1
+	CatRecord1 -> "Cat C1"
+	CableJnlRecord0 -> EquipRecord1
+	EquipRecord1 -> ""
+	EquipRecord1 -> CatRecord1
+	CatRecord1 -> "Cat C2"
+	CatRecord1 -> "Cat C3"
+	ProjectRecord0 -> SpecRecord0
+	SpecRecord0 -> ""
+	SpecRecord0 -> EquipRecord0
+	EquipRecord0 -> ""
+	EquipRecord0 -> CatRecord1
+	CatRecord1 -> "Cat C1"
+	SpecRecord0 -> EquipRecord1
+	EquipRecord1 -> ""
+	EquipRecord1 -> CatRecord1
+	CatRecord1 -> "Cat C2"
+	CatRecord1 -> "Cat C3"
+	ObjectRecord0 -> ProjectRecord1
+	ProjectRecord1 -> "Project P1"
+	ProjectRecord1 -> WorkLstRecord9
+	WorkLstRecord9 -> ""
+	WorkLstRecord9 -> "Work P1"
+	WorkLstRecord9 -> "Work P2"
+	ProjectRecord1 -> CableJnlRecord9
+	CableJnlRecord9 -> ""
+	CableJnlRecord9 -> EquipRecord4
+	EquipRecord4 -> ""
+	EquipRecord4 -> CatRecord5
+	CatRecord5 -> "Cat C5"
+	CableJnlRecord9 -> EquipRecord5
+	EquipRecord5 -> ""
+	EquipRecord5 -> CatRecord5
+	CatRecord5 -> "Cat C6"
+	CatRecord5 -> "Cat C7"
+	ProjectRecord1 -> SpecRecord2
+	SpecRecord2 -> ""
+	SpecRecord2 -> EquipRecord2
+	EquipRecord2 -> ""
+	EquipRecord2 -> CatRecord1
+	SpecRecord2 -> EquipRecord3
+	EquipRecord3 -> ""
+	EquipRecord3 -> CatRecord1
+	ObjectRecord0 -> ProjectRecord2
+	ProjectRecord2 -> "Project P2"
+	ProjectRecord2 -> WorkLstRecord18
+	WorkLstRecord18 -> ""
+	WorkLstRecord18 -> "Work P3"
+	WorkLstRecord18 -> "Work P4"
+	ProjectRecord2 -> CableJnlRecord18
+	CableJnlRecord18 -> ""
+	CableJnlRecord18 -> EquipRecord9
+	EquipRecord9 -> ""
+	EquipRecord9 -> CatRecord9
+	CatRecord9 -> "Cat C10"
+	CatRecord9 -> "Cat C11"
+	CableJnlRecord18 -> EquipRecord10
+	EquipRecord10 -> ""
+	EquipRecord10 -> CatRecord9
+	ProjectRecord2 -> SpecRecord4
+	SpecRecord4 -> ""
+	SpecRecord4 -> EquipRecord4
+	EquipRecord4 -> ""
+	EquipRecord4 -> CatRecord5
+	CatRecord5 -> "Cat C5"
+	SpecRecord4 -> EquipRecord5
+	EquipRecord5 -> ""
+	EquipRecord5 -> CatRecord5
+	CatRecord5 -> "Cat C6"
+	CatRecord5 -> "Cat C7"
+}
