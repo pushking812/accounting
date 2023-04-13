@@ -58,11 +58,11 @@ def create_instances(temp_data, classes_by_name):
         # проходим по списку наборов данных для экземпляров текущего класса
         for properties_data in instances_data:
             # получаем номер экземпляра в текущем наборе
-            instance_id = properties_data["id_by_class"]
+            id = properties_data["id"]
             # если пара (название класса, номер экземпляра) уникальна, то
-            if (class_name, instance_id) not in instances_by_id:
+            if (class_name, id) not in instances_by_id:
                 # создаем экземпляр текущего класса с текущим порядковым номером
-                instance = instance_class(instance_id)
+                instance = instance_class(id)
                 # проходим по всем элементам списка свойств экземпляра
                 for property_name, property_value in properties_data.items():
                     # если это простые данные (нет постфикса), то записываем эту  
@@ -72,22 +72,22 @@ def create_instances(temp_data, classes_by_name):
 
                     # сохраняем экземпляр в словаре на кортеже, дочерние
                     # классы subinstances заполнятся позже в create_relationships
-                    instances_by_id[(class_name, instance_id)] = instance
+                    instances_by_id[(class_name, id)] = instance
     return instances_by_id
 
 
 def create_relationships(temp_data, instances_by_id):
     ''' создает связи между экземплярами, добавляя в subinstances объекты дочерних экземпляров 
     temp_data - список наборов свойств экземпляров [{'ClassName1':{'PropertyName':PropertyValue, ...}}, ...]; 
-    instances_by_id - словарь на списках кортежей ('ClassName1', 'id_by_class') = <class ClassName1 object>'''
+    instances_by_id - словарь на списках кортежей ('ClassName1', 'id') = <class ClassName1 object>'''
     # проходим по всем классам по парам (имя класса, список наборов данных для экземпляров)
     for class_name, instances_data in temp_data.items():
             # проходим по списку наборов данных для экземпляров текущего класса
             for properties_data in instances_data:
                 # каждый набор данных это экземпляр с порядковым номером
-                instance_id = properties_data["id_by_class"]
+                id = properties_data["id"]
                 # получаем объект данного экземпляра из словаря по кортежу
-                instance = instances_by_id[(class_name, instance_id)]
+                instance = instances_by_id[(class_name, id)]
                 # проходим по всем элементам списка свойств экземпляра
                 for property_name, property_value in properties_data.items():
 

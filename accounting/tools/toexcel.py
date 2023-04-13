@@ -57,9 +57,9 @@ def get_row(instance, headers):
             # получаем экземпляры этого класса из subinstances, если такого ключа нет
             # то пустой список
             subinstances = instance.subinstances.get(subinstances_class_name, [])
-            # через запятую перечисляем номера id_by_class экземпляров, 
+            # через запятую перечисляем номера id экземпляров, 
             # если их несколько и добавляем их в поле строки данных
-            row.append(",".join(str(subinstance.fields["id_by_class"]) 
+            row.append(",".join(str(subinstance.fields["id"]) 
                                 for subinstance in subinstances))
         # если этот заголовок из field (простые данные) добавляем данные в строку
         else:

@@ -11,7 +11,7 @@ def initialize_instances():
     # справочник объектов
     objs = [Object(**d) for d in 
         [
-            {'instance_id': None, 'number': f'O{i}', 'name': f'Object1 O{i}'}
+            {'id': None, 'number': f'O{i}', 'name': f'Object1 O{i}'}
             for i in range(1)
         ] 
     ]
@@ -19,7 +19,7 @@ def initialize_instances():
     # справочник проектов
     projs = [Project(**d) for d in 
         [
-            {'instance_id': None, 'number': f'P{i}', 'name': f'Project P{i}'}
+            {'id': None, 'number': f'P{i}', 'name': f'Project P{i}'}
             for i in range(3)
         ] 
     ]
@@ -27,7 +27,7 @@ def initialize_instances():
     # справочник спецификаций
     specs = [SpecLst(**d) for d in
         [ 
-            {'instance_id': None, 'number': f'S{i}', 'name': f'SpecLst P{i}'}
+            {'id': None, 'number': f'SL{i}', 'name': f'SpecLst P{i}'}
             for i in range(6)
         ] 
     ]
@@ -35,7 +35,7 @@ def initialize_instances():
     # справочник кабельных журналов
     cabjs = [CableLst(**d) for d in
         [ 
-            {'instance_id': None, 'number': f'S{i}', 'name': f'CableLst P{i}'}
+            {'id': None, 'number': f'CL{i}', 'name': f'CableLst P{i}'}
             for i in range(3)
         ] 
     ]
@@ -43,7 +43,7 @@ def initialize_instances():
     # справочник кабельных журналов
     wrkls = [WorkLst(**d) for d in
         [ 
-            {'instance_id': None, 'number': f'S{i}', 'name': f'WorkLst P{i}'}
+            {'id': None, 'number': f'WL{i}', 'name': f'WorkLst P{i}'}
             for i in range(3)
         ] 
     ]
@@ -51,7 +51,7 @@ def initialize_instances():
     # справочник ведомостей работ
     wrks = [Work(**d) for d in
         [ 
-            {'instance_id': None, 'number': f'S{i}', 'name': f'Work P{i}'}
+            {'id': None, 'number': f'S{i}', 'name': f'Work P{i}'}
             for i in range(6)
         ] 
     ]
@@ -59,7 +59,7 @@ def initialize_instances():
     # справочник категорий материалов и оборудования
     cats = [Cat(**d) for d in
         [
-           {'instance_id': None, 'number': f'C{i}' , 'name': f'Cat C{i}'}
+           {'id': None, 'number': f'C{i}' , 'name': f'Cat C{i}'}
            for i in range(24)
         ] 
     ]
@@ -67,27 +67,26 @@ def initialize_instances():
     # справочник материалов и оборудования
     equips = [Equipment(**d) for d in
         [
-           {'instance_id': None, 'number': f'E{i}', 'name':  f'Nomenclature E{i}'}
+           {'id': None, 'number': f'E{i}', 'name':  f'Equipment E{i}'}
            for i in range(24)
         ] 
 
     ]
     
     # дерево категорий материалов и оборудования
-    cr=[]
+    cat_recs=[]
     for i in range(1, 14, 4):
-            cr.append({'instance_id': i, 'name':f'CatRecord{i}',   'subinstances': [cats[i]]})              # 0
-            cr.append({'instance_id': i+1, 'name':f'CatRecord{i}', 'subinstances': [cats[i+1], cats[i+2]]}) # 0.0
-            cr.append({'instance_id': i+2, 'name':f'CatRecord{i}', 'subinstances': None})                 # 0.0.0
-            cr.append({'instance_id': i+3, 'name':f'CatRecord{i}', 'subinstances': None})                 # 0.0.1
-    cat_recs = [CatRecord(**d) for d in cr]
+        cat_recs.append(CatRecord(**{'id': i  , 'name':f'CatRecord{i}'  , 'subinstances': [cats[i-1]]}))                   # 0.0.0
+        cat_recs.append(CatRecord(**{'id': i+1, 'name':f'CatRecord{i+1}', 'subinstances': [cats[i]]}))                 # 0.0.1
+        cat_recs.append(CatRecord(**{'id': i+2, 'name':f'CatRecord{i+2}', 'subinstances': [cats[i+1], cat_recs[-1], cat_recs[-2]]})) # 0.0
+        cat_recs.append(CatRecord(**{'id': i+3, 'name':f'CatRecord{i+3}', 'subinstances': [cats[i+2], cat_recs[-1]]}))         # 0
 
 
     # список записей с информацией о материалах и оборудовании
     # (категория материала, документы качества на материал и т.п.)
-    nom_recs = [NomRecord(**d) for d in 
+    equip_recs = [EquipRecord(**d) for d in 
         [
-            {'instance_id': None, 'name':f'NomRecord{i}',
+            {'id': None, 'name':f'EquipRecord{i}',
              'subinstances': [equips[i],  cat_recs[i]]}
             for i in range(16)
         ]
@@ -96,8 +95,8 @@ def initialize_instances():
     # список кабельных журналов со связанной номенклатурой
     cabj_recs = [CableJnlRecord(**d) for d in 
         [
-            {'instance_id': None, 'name':f'CableJnlRecord{j}',
-             'subinstances': [cabjs[i//9]]+[nom_recs[i//2] for i in range(j,j+3)]}
+            {'id': None, 'name':f'CableJnlRecord{j}',
+             'subinstances': [cabjs[i//9]]+[equip_recs[i//2] for i in range(j,j+3)]}
             for j in range(0, 25, 9)
         ]
     ]
@@ -105,7 +104,7 @@ def initialize_instances():
     # список ведомостей работ
     wrkl_recs = [WorkLstRecord(**d) for d in 
         [
-            {'instance_id': None, 'name':f'WorkLstRecord{j}',
+            {'id': None, 'name':f'WorkLstRecord{j}',
              'subinstances': [wrkls[i//9]]+[wrks[i//5] for i in range(j,j+3)]}
             for j in range(0, 25, 9)
         ]
@@ -114,8 +113,8 @@ def initialize_instances():
     # список спецификаций со связанной номенклатурой
     spec_recs = [SpecRecord(**d) for d in 
         [
-            {'instance_id': None, 'name':f'SpecRecord{j}', 
-             'subinstances': [specs[j//2]]+[nom_recs[i] for i in range(j,j+2)]}
+            {'id': None, 'name':f'SpecRecord{j}', 
+             'subinstances': [specs[j//2]]+[equip_recs[i] for i in range(j,j+2)]}
             for j in range(0, 12, 2)
         ]
     ]
@@ -123,7 +122,7 @@ def initialize_instances():
     # список проектов со связанными спецификациями
     proj_recs = [ProjectRecord(**d) for d in 
         [
-            {'instance_id': None, 'name':f'ProjectRecord{i}',
+            {'id': None, 'name':f'ProjectRecord{i}',
              'subinstances': [projs[i]]+[wrkl_recs[i]]+[cabj_recs[i]]+[spec_recs[i]]
             }
             for i in range(3)
@@ -133,7 +132,7 @@ def initialize_instances():
     # список объектов со связанными проектами
     obj_recs = [ObjectRecord(**d) for d in 
         [
-            {'instance_id': None, 'name':f'ObjectRecord{j}',
+            {'id': None, 'name':f'ObjectRecord{j}',
              'subinstances': [objs[j]]+[proj_recs[i] for i in range(j,j+3)]}
             for j in range(1)
         ]
@@ -164,6 +163,7 @@ class AccApp:
     def run(self):
         my_graph = o[0].traverse_graph()
         my_graph.view()
+        
         # read_from_file('data/data.xlsx')
         write_to_file('data/data2.xlsx')
 

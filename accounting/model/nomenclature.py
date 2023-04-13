@@ -1,8 +1,8 @@
 from .instance import Instance
 
 class Nomenclature(Instance):
-    def __init__(self, cls, instance_id = None, number = None, name = None):
-        super().__init__(cls, instance_id)
+    def __init__(self, cls, id = None, number = None, name = None):
+        super().__init__(cls, id)
 
         if number == None:
             number = ''
@@ -14,20 +14,20 @@ class Nomenclature(Instance):
         self.fields['name'] = name
         
 class Equipment(Nomenclature):
-    def __init__(self, instance_id = None, number = None, name = None):
-        super().__init__(type(self), instance_id)
+    def __init__(self, id = None, number = None, name = None):
+        super().__init__(type(self), id, number, name)
 
 class Cable(Nomenclature):
-    def __init__(self, instance_id = None, number = None, name = None):
-        super().__init__(type(self), instance_id)
+    def __init__(self, id = None, number = None, name = None):
+        super().__init__(type(self), id, number, name)
         
 class Material(Nomenclature):
-    def __init__(self, instance_id = None, number = None, name = None):
-        super().__init__(type(self), instance_id)
+    def __init__(self, id = None, number = None, name = None):
+        super().__init__(type(self), id, number, name)
         
 class Cat(Instance):
-    def __init__(self, instance_id = None, number = None, name = None):
-        super().__init__(type(self), instance_id)
+    def __init__(self, id = None, number = None, name = None):
+        super().__init__(type(self), id)
         
         if number == None:
             number = ''

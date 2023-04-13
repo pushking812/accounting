@@ -1,8 +1,8 @@
 from .instance import Instance
 
 class Doc(Instance):
-    def __init__(self, cls, instance_id = None, number = None, name = None):
-        super().__init__(cls, instance_id)
+    def __init__(self, cls, id = None, number = None, name = None):
+        super().__init__(cls, id)
 
         if number == None:
             number = ''
@@ -14,13 +14,13 @@ class Doc(Instance):
         self.fields['name'] = name
 
 class CableLst(Doc):
-    def __init__(self, instance_id = None, number = None, name = None):
-        super().__init__(type(self), instance_id, name)
+    def __init__(self, id = None, number = None, name = None):
+        super().__init__(type(self), id, number, name)
 
 class SpecLst(Doc):
-    def __init__(self, instance_id = None, number = None, name = None):
-        super().__init__(type(self), instance_id, name)
+    def __init__(self, id = None, number = None, name = None):
+        super().__init__(type(self), id, number, name)
 
 class WorkLst(Doc):
-    def __init__(self, instance_id = None, number = None, name = None):
-        super().__init__(type(self), instance_id, name)
+    def __init__(self, id = None, number = None, name = None):
+        super().__init__(type(self), id, number, name)

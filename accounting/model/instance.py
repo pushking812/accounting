@@ -3,10 +3,13 @@ from ..tools import fromexcel
 from ..tools import toexcel
 from graphviz import Digraph
 
+
 class Instance:
     instances_by_class = {}
+    count_by_class = {}
+    max_id_by_class = {}
 
-    def __init__(self, instance_class, instance_id=None):
+    def __init__(self, instance_class, id=None):
         class_name = instance_class.__name__
 
         instances = Instance.instances_by_class
@@ -17,16 +20,79 @@ class Instance:
 
         instances[class_name].append(self)
 
-        if instance_id == None:
-            instance_id = instance.CountInstances.add_instance(self)
+        if id == None:
+            id = self.count_instance()
 
         self.fields = {
-            'id_by_class': instance_id
+            'id': id
         }
 
         self.subinstances = {}
 
+    def __del__(self):
+        self.uncount_instance()
+        
+    @classmethod
+    def get_instance(cls, id = None, number = None):
+        ''' возвращает экземпляр по значению свойства '''
+        for instance in cls.instances_by_class:
+            # instance.__dict__.items() словарь атрибутов 
+            # экземпляра instance в виде пар ключ-значение.
+            if isinstance(instance, cls):
+                for property_name, property_value in instance.__dict__.items():
+                    if property_name == 'id' and property_value == id:
+                        return instance
+                    elif property_name == 'number' and property_value == number:
+                        return instance
+                    else:
+                        raise ValueError("Wrong property value!")
+        return None
+        
+    @classmethod
+    def _get_instance_by_property(cls, id=None, number=None):
+        if id is not None:
+            return cls.get_instance(id=id)
+        elif number is not None:
+            return cls.get_instance(number=number)
+        else:
+            raise ValueError("Property wasn't set!")
 
+    @classmethod
+    def update_instance_fields(cls, value, id=None, number=None):
+        if value is None:
+            raise ValueError("New values weren't set!")
+        
+        result = cls._get_instance_by_property(id=id, number=number)
+        result.fields.update(value)
+
+    @classmethod
+    def remove_instance(cls, id=None, number=None):
+        result = cls._get_instance_by_property(id=id, number=number)
+        
+        if result is not None:
+            del result
+        else:
+            raise ValueError("Wrong property!")
+        
+
+    def uncount_instance(self):
+        ''' уменьшаем индекс экземпляров класса '''
+        class_name = self.__class__.__name__
+        if class_name in Instance.count_by_class:
+            Instance.count_by_class[class_name] -= 1
+
+    def count_instance(self):
+        ''' увеличивает индекс экземпляров класса '''
+        class_name = self.__class__.__name__
+        Instance.count_by_class[class_name] = Instance.count_by_class.get(class_name, 0) + 1
+        Instance.max_id_by_class[class_name] = Instance.max_id_by_class.get(class_name, 0) + 1
+        return Instance.max_id_by_class[class_name]
+    
+    def get_number(self):
+        ''' возвращает количество количество экземпляров класса'''
+        class_name = self.__class__.__name__
+        return Instance.count_by_class.get(class_name, 0)
+        
     def add_subinstance(self, subinstance):
         ''' добавляет в текущий экземпляр дочерний объект '''
         key = type(subinstance).__name__
@@ -35,19 +101,17 @@ class Instance:
         if subinstance not in self.subinstances[key]:
             self.subinstances[key].append(subinstance)
 
-
-    def get_subinstance(self, class_name, id_by_class=None):
+    def get_subinstance(self, class_name, id=None):
         ''' по имени класса и номеру объекта получаем дочерний объект 
             если не указан номер, то получаем список всех объектов '''
         if class_name in self.subinstances:
             subinstance = self.subinstances[class_name]
             if isinstance(subinstance, list):
-                if id_by_class is None:
+                if id is None:
                     raise ValueError("Index hasn't been set")
-                return subinstance[id_by_class]
+                return subinstance[id]
             return subinstance
         return []
-
 
     def remove_subinstance(self, instance):
         key = type(instance).__name__
@@ -91,7 +155,6 @@ class Instance:
                         depth=depth-1 if depth is not None else None, graph=graph)
         return graph
 
-
     @classmethod
     def display_properties(cls, instance):
         for n in instance.__dict__.items():
@@ -99,18 +162,15 @@ class Instance:
             print(n)
         print('========================')
 
-
     @classmethod
     def from_excel(cls, file, classes_by_name):
         ''' загружает данные из excel в экземпляры классов'''
         fromexcel.from_excel(file, classes_by_name)
 
-
     @classmethod
     def to_excel(cls, file):
          '''сохраняет данные экземпляров классов в excel'''
          toexcel.to_excel(cls, file)
-
 
     @classmethod
     def add_field(cls, value, key):
@@ -130,38 +190,16 @@ class Instance:
                     result.append(instance.fields[key])
         return result
 
-
     @classmethod
     def get_instances(cls):
         ''' возвращает список кортежей (имя свойства, значение) для экземпляров класса'''
         result=[]
-        for instance in cls.instances:
+        for instance in cls.instances_by_class:
             # instance.__dict__.items() словарь атрибутов 
             # экземпляра instance в виде пар ключ-значение.
             for property_name, property_value in instance.__dict__.items():
                 if isinstance(instance, cls):
                     result.append((property_name, property_value))
         return result
-    
 
-class CountInstances:
-    count_by_class = {}
-    max_id_by_class = {}
-
-    @classmethod
-    def add_instance(cls, instance):
-        class_name = instance.__class__.__name__
-        cls.count_by_class[class_name] = cls.count_by_class.get(class_name, 0) + 1
-        cls.max_id_by_class[class_name] = cls.max_id_by_class.get(class_name, 0) + 1
-        return cls.max_id_by_class[class_name]
     
-    @classmethod
-    def remove_instance(cls, instance):
-        class_name = instance.__class__.__name__
-        if class_name in cls.count_by_class:
-            cls.count_by_class[class_name] -= 1
-        
-    @classmethod
-    def get_number(cls, instance):
-        class_name = instance.__class__.__name__
-        return cls.count_by_class.get(class_name, 0)

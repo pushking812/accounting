@@ -1,15 +1,15 @@
 
 
 # specs_data = [
-#     {'instance_id': None, 'number': 'S1', 'name': 'Spec1'},
-#     {'instance_id': None, 'number': 'S2', 'name': 'Spec2'},
-#     {'instance_id': None, 'number': 'S3', 'name': 'Spec3'},
-#     {'instance_id': None, 'number': 'S4', 'name': 'Spec4'},
-#     {'instance_id': None, 'number': 'S5', 'name': 'Spec5'},
-#     {'instance_id': None, 'number': 'S6', 'name': 'Spec6'},
+#     {'id': None, 'number': 'S1', 'name': 'Spec1'},
+#     {'id': None, 'number': 'S2', 'name': 'Spec2'},
+#     {'id': None, 'number': 'S3', 'name': 'Spec3'},
+#     {'id': None, 'number': 'S4', 'name': 'Spec4'},
+#     {'id': None, 'number': 'S5', 'name': 'Spec5'},
+#     {'id': None, 'number': 'S6', 'name': 'Spec6'},
 # ]
 # spec_recs_data = [
-#     {'instance_id': None, 'number': 'S1', 'name': 'Spec1'},
+#     {'id': None, 'number': 'S1', 'name': 'Spec1'},
 #     {'proj_id': 0, 'spec_id': 0, 'spec_rec_id': 0,
 #         'number': 2, 'value': 200.0, 'equip_id': 1},
 #     {'proj_id': 0, 'spec_id': 0, 'spec_rec_id': 0,
