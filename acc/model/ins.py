@@ -1,8 +1,6 @@
-from . import instance
-from ..tools import fromexcel
-from ..tools import toexcel
+# from . import ins
+from ..tools import fromexcel, toexcel
 from graphviz import Digraph
-
 
 class Instance:
     instances_by_class = {}
@@ -23,9 +21,7 @@ class Instance:
         if id == None:
             id = self.count_instance()
 
-        self.fields = {
-            'id': id
-        }
+        self.fields['id'] = id
 
         self.subinstances = {}
 
@@ -113,12 +109,12 @@ class Instance:
             return subinstance
         return []
 
-    def remove_subinstance(self, instance):
-        key = type(instance).__name__
-        if key in self.subinstances:
-            self.subinstances[key].remove(instance)
-            Instance.instances_by_class[key].remove(instance)
-            instance.CountInstances.remove_instance(instance)
+    def remove_subinstance(self, class_name, id):
+        subinstance = self.get_subinstance(class_name, id)
+        if class_name in self.subinstances:
+            self.subinstances[class_name].remove(subinstance)
+            Instance.instances_by_class[class_name].remove(subinstance)
+            Instance.remove_instance(subinstance)
 
     def traverse_properties(self, depth=None):
         print(f"---------------------------")
